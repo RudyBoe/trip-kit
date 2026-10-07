@@ -103,7 +103,10 @@ function main() {
   const signsPath = join(ROOT, "data", "signs.json");
   const signs = JSON.parse(readFileSync(signsPath, "utf8"));
   const phrases = JSON.parse(readFileSync(join(ROOT, "data", "phrases.json"), "utf8"));
-  const vocab = pkgFile("kotobako-data", "kotobako-static.json").datasets.vocab;
+  const { vocab, kanji: joyo } = pkgFile("kotobako-data", "kotobako-static.json").datasets;
+  // KANJIDIC2 order (main readings first) for the jōyō kanji; kanji-data
+  // has every kanji but sorts readings by kana.
+  const ordered = new Map(joyo.map((k) => [k.char, k]));
   const meta = pkgFile("kanji-data", "data/kanji-meta.json");
   const klevel = {};
   for (const lv of [5, 4, 3, 2, 1]) for (const k of pkgFile("kanji-data", `data/lists/jlpt-${lv}.json`)) klevel[k] ??= lv;
@@ -167,10 +170,17 @@ function main() {
     if (!/[一-鿿]/.test(k) || kanji[k]) continue;
     const m = meta[k];
     if (!m) { errors.push(`no KANJIDIC entry for ${k}`); continue; }
+    const o = ordered.get(k);
+    // Plain readings first, then suffix/prefix forms (-ど.まり, うわ-).
+    const clean = (list) => {
+      const plain = list.filter((x) => !x.includes("-"));
+      return [...plain, ...list.map((x) => x.replace(/-/g, ""))].filter((x, i, a) => x && a.indexOf(x) === i);
+    };
     kanji[k] = {
       kw: m.heisig_en || m.meanings[0],
-      kun: (m.kun_readings || []).map((x) => x.replace(/[.-]/g, "")).filter((x, i, a) => x && a.indexOf(x) === i),
-      on: (m.on_readings || []).map((x) => x.replace(/-/g, "")),
+      // "と.まる": the dot marks the okurigana (the app matches on the stem).
+      kun: clean(o ? o.kunyomi : m.kun_readings || []),
+      on: clean(o ? o.onyomi : m.on_readings || []),
       n: klevel[k] || 0,
     };
   }
