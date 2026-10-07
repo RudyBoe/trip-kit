@@ -1,0 +1,14 @@
+{
+  "name": "Trip Kit",
+  "short_name": "Trip Kit",
+  "description": "Japanese road signs, place names and pocket phrases for a drive from Osaka to Toyama.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#f6f3ee",
+  "theme_color": "#f6f3ee",
+  "icons": [
+    { "src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any maskable" },
+    { "src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
+  ]
+}
