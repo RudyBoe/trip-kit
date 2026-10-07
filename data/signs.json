@@ -115,7 +115,7 @@
   {"id":"gomi-okiba","ja":"ごみ置き場","reading":"ごみおきば","en":"Garbage point","category":"garbage","leg":"hida","route_order":1140,"lesson":26,"example":"ごみ置き場は家の前にあります。"},
   {"id":"bin-kan","ja":"瓶・缶","reading":"びん・かん","en":"Bottles & cans","category":"garbage","leg":"hida","route_order":1150,"lesson":26,"example":"瓶・缶は洗ってから出してください。"},
   {"id":"petto-botoru","ja":"ペットボトル","reading":"ペットボトル","en":"PET bottles","category":"garbage","leg":"hida","route_order":1160,"note":"Cap and label off, rinse, squash.","example":"ペットボトルのキャップは外してください。"},
-  {"id":"bunbetsu","ja":"分別","reading":"ぶんべつ","en":"Sorting (garbage)","category":"garbage","leg":"hida","route_order":1170,"note":"Read ふんべつ, it means 'good sense': a different word.","example":"ごみは分別して出してください。","verb":{"forms":["分別する","分別します","分別して","分別しない"],"suru":true}},
+  {"id":"bunbetsu","ja":"分別","reading":"ぶんべつ","en":"Sorting (garbage)","category":"garbage","leg":"hida","route_order":1170,"note":"Not ふんべつ, which means 'good sense'.","example":"ごみは分別して出してください。","verb":{"forms":["分別する","分別します","分別して","分別しない"],"suru":true}},
   {"id":"shiyuuchi","ja":"私有地","reading":"しゆうち","en":"Private land","category":"house","leg":"hida","route_order":1180,"lookalike_group":"no-entry","example":"ここは私有地ですから、入らないでください。"},
   {"id":"tachiiri-kinshi","ja":"立入禁止","reading":"たちいりきんし","en":"No entry (people)","category":"house","leg":"hida","route_order":1190,"lookalike_group":"no-entry","lesson":33,"note":"関係者以外立入禁止 = staff only.","example":"「立入禁止」と書いてあります。"},
   {"id":"kinshi","ja":"禁止","reading":"きんし","en":"Prohibited","category":"house","leg":"hida","route_order":1200,"lookalike_group":"ban-permit","jlpt":"N3","note":"Ending of many signs: 駐車禁止, 撮影禁止 (no photos).","example":"ここでたばこを吸うのは禁止です。"},
