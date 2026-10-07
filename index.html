@@ -1,0 +1,115 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#f6f3ee" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#16161a" media="(prefers-color-scheme: dark)">
+<title>Trip Kit</title>
+<meta name="description" content="Japanese road signs, place names and pocket phrases for a drive from Osaka to Toyama.">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<link rel="icon" href="icons/icon-192.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Trip Kit">
+<link rel="stylesheet" href="style.css?v=1">
+<script type="module" src="app.js?v=1"></script>
+</head>
+<body>
+<header>
+  <h1>Trip Kit</h1>
+  <p id="score" aria-live="polite"></p>
+  <button id="menu-btn" aria-label="Settings and about">⋯</button>
+</header>
+
+<main>
+  <!-- Signs -->
+  <section id="tab-signs" class="tab">
+    <div class="seg" role="tablist" aria-label="Mode">
+      <button data-mode="flash" role="tab">Flash</button>
+      <button data-mode="reveal" role="tab">Reveal</button>
+      <button data-mode="look" role="tab">Look-alikes</button>
+      <button data-mode="route" role="tab">Route</button>
+    </div>
+    <div class="filters">
+      <select id="f-cat" aria-label="Category"></select>
+      <select id="f-leg" aria-label="Leg"></select>
+      <button id="f-missed" aria-pressed="false" aria-label="Missed only">✗ <span id="missed-n">0</span></button>
+    </div>
+    <div id="signs-view" class="view"></div>
+  </section>
+
+  <!-- Pocket -->
+  <section id="tab-pocket" class="tab" hidden>
+    <div class="seg" role="tablist" aria-label="Show">
+      <button data-pview="cards" role="tab">Cards</button>
+      <button data-pview="all" role="tab">All phrases</button>
+      <button data-pview="me" role="tab">Addresses</button>
+    </div>
+    <div id="pocket-view"></div>
+  </section>
+
+  <!-- Export -->
+  <section id="tab-export" class="tab" hidden>
+    <h2>Anki export</h2>
+    <p class="muted">Signs to export as an Anki import file (tab-separated, 6 fields + tags).</p>
+    <div class="quick">
+      <button data-sel="missed">Missed now</button>
+      <button data-sel="ever">Ever missed</button>
+      <button data-sel="all">All</button>
+      <button data-sel="none">None</button>
+    </div>
+    <button id="anki" class="primary wide">Export</button>
+    <details id="sel-box">
+      <summary>Choose signs (<span id="sel-n">0</span> selected)</summary>
+      <div id="sel-list"></div>
+    </details>
+
+    <h2>Progress</h2>
+    <p class="muted" id="stats"></p>
+    <div class="row">
+      <button id="backup">Back up</button>
+      <button id="restore">Restore</button>
+    </div>
+    <input type="file" id="restore-file" accept="application/json,.json" hidden>
+    <button id="reset" class="danger wide">Reset progress</button>
+  </section>
+</main>
+
+<nav class="tabbar" aria-label="Sections">
+  <button data-tab="signs"><span aria-hidden="true">止</span>Signs</button>
+  <button data-tab="pocket"><span aria-hidden="true">話</span>Pocket</button>
+  <button data-tab="export"><span aria-hidden="true">⇪</span>Export</button>
+</nav>
+
+<!-- Full-screen card to show someone -->
+<dialog id="card" aria-label="Card">
+  <div class="card-body">
+    <p id="card-ja" lang="ja"></p>
+    <p id="card-en"></p>
+  </div>
+  <div class="card-nav">
+    <button id="card-prev" aria-label="Previous card">‹</button>
+    <button id="card-close">Close</button>
+    <button id="card-next" aria-label="Next card">›</button>
+  </div>
+</dialog>
+
+<dialog id="menu">
+  <form method="dialog">
+    <h2>Settings</h2>
+    <label class="field">Flash time <output id="flash-out">2 s</output></label>
+    <input type="range" id="opt-flash" min="1" max="5" step="1" value="2" aria-label="Flash time in seconds">
+    <p class="credits">How long a sign stays on screen in Flash mode before the choices appear.</p>
+
+    <h2>About</h2>
+    <p class="credits">Trip Kit drills the Japanese you meet on the road from Osaka through Shiga and Gifu into the Hida mountains and Toyama: signs, place names and phrases for hosts. A sibling of <a href="https://rudyboe.github.io/kanji-trainer/">Kanji Trainer</a>. Everything stays on this device; it works offline after the first visit.</p>
+    <p class="credits">Readings checked against <a href="https://www.edrdg.org/jmdict/j_jmdict.html">JMdict</a> and <a href="https://www.edrdg.org/wiki/index.php/KANJIDIC_Project">KANJIDIC2</a> (© Electronic Dictionary Research and Development Group, CC BY-SA 4.0), via <a href="https://www.npmjs.com/package/kotobako-data">kotobako-data</a> and <a href="https://www.npmjs.com/package/kanji-data">kanji-data</a>. JLPT levels from <a href="https://www.tanos.co.uk/jlpt/">Jonathan Waller's JLPT lists</a>. Kanji keywords from James Heisig's <i>Remembering the Kanji</i> (via kanji-data). Lesson numbers refer to <i>Minna no Nihongo</i>.</p>
+    <p class="credits">Signs, notes and phrases: written for this trip; check local rules on the spot (garbage days differ per town).</p>
+    <button value="close" class="primary">Done</button>
+  </form>
+</dialog>
+
+<div id="toast" role="status"></div>
+</body>
+</html>
