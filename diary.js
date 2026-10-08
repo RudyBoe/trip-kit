@@ -280,3 +280,68 @@ const str = (x) => (typeof x === "string" ? x : "");
 const isDate = (x) => /^\d{4}-\d{2}-\d{2}$/.test(str(x));
 const safeUrl = (x) => (/^https?:\/\//i.test(str(x)) ? str(x) : "");
 
+// Reads the JSON that "Export backup" in the web diary writes
+// ({stops, days, schedule}; an older file is just a list of stops).
+async function importFile(e) {
+  const f = e.target.files[0];
+  e.target.value = "";
+  if (!f) return;
+  let j;
+  try { j = JSON.parse(await f.text()); } catch { j = null; }
+  const stops = Array.isArray(j) ? j : j?.stops;
+  const tripDays = j?.days;
+  const sched = j?.schedule;
+  if (!j || typeof j !== "object" || ![stops, tripDays, sched].some(Array.isArray)) { toast("That isn't a diary export"); return; }
+  const d = D();
+  let a = 0, b = 0, c = 0;
+  for (const s of Array.isArray(stops) ? stops : []) {
+    if (!s || !str(s.id) || !isDate(s.date) || !safeUrl(s.url)) continue;
+    upsert(d.stops, { id: str(s.id), url: safeUrl(s.url), title: str(s.title) || "Untitled stop", date: s.date, time: str(s.time), kind: Object.hasOwn(KINDS, s.kind) ? s.kind : "other", leg: Object.hasOwn(LEGS, s.leg) ? s.leg : "", note: str(s.note), createdAt: Number(s.createdAt) || Date.now() });
+    a++;
+  }
+  for (const x of Array.isArray(tripDays) ? tripDays : []) {
+    if (!x || !isDate(x.date) || !["day", "move"].includes(x.mode)) continue;
+    d.days[x.date] = { date: x.date, mode: x.mode, from: str(x.from), to: str(x.to) };
+    b++;
+  }
+  for (const s of Array.isArray(sched) ? sched : []) {
+    if (!s || !str(s.id) || !isDate(s.start) || !str(s.title)) continue;
+    upsert(d.plans, { id: str(s.id), title: str(s.title), kind: Object.hasOwn(PKINDS, s.kind) ? s.kind : "plan", place: str(s.place), start: s.start, end: isDate(s.end) ? s.end : "", url: safeUrl(s.url), note: str(s.note), createdAt: Number(s.createdAt) || Date.now() });
+    c++;
+  }
+  save();
+  renderDiary();
+  toast(`Imported ${a} stops, ${b} trip days, ${c} schedule items`);
+}
+
+function exportText() {
+  const d = D();
+  const out = ["TRIP DIARY", ""];
+  const plans = [...d.plans].sort((x, y) => x.start.localeCompare(y.start));
+  if (plans.length) {
+    out.push("SCHEDULE");
+    for (const s of plans) {
+      const end = s.end && s.end > s.start ? s.end : "";
+      out.push(`${fmtShort(s.start)}${end ? ` → ${fmtShort(end)}` : ""} · ${PKINDS[s.kind] || "Plan"} · ${s.title}${end && s.kind === "house" ? ` (${nights(s.start, end)} nights)` : ""}`);
+      if (s.place) out.push(`   ${s.place}`);
+      if (s.note) out.push(`   ${s.note}`);
+      if (s.url) out.push(`   ${s.url}`);
+    }
+    out.push("");
+  }
+  const keys = [...new Set([...d.stops.map((s) => s.date), ...Object.keys(d.days)])].sort();
+  for (const k of keys) {
+    const trip = d.days[k];
+    out.push(fmtDay(k).toUpperCase());
+    if (trip?.mode === "move") out.push(`Moving: ${trip.from || "?"} → ${trip.to || "?"}`);
+    if (trip?.mode === "day") out.push(`Day trip: ${trip.from || "Home"} → ${trip.to || "?"} → back`);
+    for (const s of d.stops.filter((x) => x.date === k).sort((x, y) => (x.time || "99").localeCompare(y.time || "99"))) {
+      out.push(`${s.time ? s.time + " " : ""}${s.title} [${KINDS[s.kind] || "Other"}${s.leg ? ", " + LEGS[s.leg] : ""}]`);
+      if (s.note) out.push(`   ${s.note}`);
+      out.push(`   ${s.url}`);
+    }
+    out.push("");
+  }
+  if (out.length <= 2) { toast("The diary is empty"); return; }
+  saveFile(`trip-diary-${today()}.txt`, out.join("\n"), "text/plain");
+}

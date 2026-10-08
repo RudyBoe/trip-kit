@@ -174,7 +174,7 @@ async function restore(e) {
   try { d = JSON.parse(await f.text()); } catch { d = null; }
   if (d?.app !== "trip-kit" || typeof d.state !== "object") { toast("That isn't a Trip Kit backup"); return; }
   const seen = Object.keys(d.state.progress || {}).length;
-  if (!confirm(`Restore the backup from ${String(d.saved).slice(0, 10)}? (${seen} signs seen)\n\nThis replaces progress and addresses on this device.`)) return;
+  if (!confirm(`Restore the backup from ${String(d.saved).slice(0, 10)}? (${seen} signs seen)\n\nThis replaces progress, addresses and the diary on this device.`)) return;
   try { localStorage.setItem(STORE, JSON.stringify(d.state)); } catch { toast("Couldn't save the backup here"); return; }
   location.reload();
 }
