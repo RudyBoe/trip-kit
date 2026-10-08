@@ -6,7 +6,7 @@ A small, phone-first web app for a road trip through Japan: **Osaka → Shiga �
 
 It is a sibling of [Kanji Trainer](https://rudyboe.github.io/kanji-trainer/): same look, light/dark following the phone, no login, no backend. Everything you do stays on your phone. After the first visit it works offline (for example in a tunnel or in the mountains). On iPhone use *Share → Add to Home Screen*, on Android *Install app*, to get it as an app.
 
-## The three tabs
+## The four tabs
 
 ### 止 Signs
 
@@ -27,10 +27,22 @@ Filters at the top: category, leg, and **✗** for the signs you missed last tim
 - **All phrases**: tap a phrase for the reading and English; *Show card* makes any phrase full-screen.
 - **Addresses**: your name, your country (in Japanese) and your stays (address, host, phone). These fill the blanks in phrases such as 「{address}の家を借りています。」. *Use in cards* picks the stay the cards talk about. Stored only on your phone (and in your backup file).
 
+### 記 Diary
+
+A dated trip diary and schedule that works offline, so you can log things in a car park in the mountains. Stored on the phone and included in the backup.
+
+- **Days**: tap *+ Stop*, paste a Google Maps link (the *Paste* button reads your clipboard), pick the date, an optional time, a type (stay, eat, see, drive, shop) and an area. The place name is taken from long links; short `maps.app.goo.gl` links have no name, so type it. *Open in Maps* opens the place in the Maps app. Stops are grouped by date.
+- **Trip day**: mark a date as a *day trip, back home* (from your house to a place and back) or a *move from A to B*. It shows as a banner above that day's stops.
+- **Schedule**: houses (with the number of nights), car rental, trains and plans with from/to dates. The current item is marked *Now*, past ones are dimmed.
+- **Import from web diary**: reads the JSON written by *Export backup* in the Tabi Diary web page and merges it (same id = updated, nothing is deleted).
+- **Share as text**: the whole diary as a plain text file, for Notes or mail.
+
+Google Maps links need a connection to open. Download the areas you will drive through in the Google Maps app (*Offline maps*) so the places still open without signal.
+
 ### ⇪ Export
 
 - **Anki export**: choose signs (*Missed now*, *Ever missed*, *All*, or one by one) and export them as an Anki import file. See below.
-- **Back up / Restore** your progress and addresses as a JSON file, like in Kanji Trainer. Use it before changing phones or clearing the browser.
+- **Back up / Restore** your progress, addresses and diary as a JSON file, like in Kanji Trainer. Use it before changing phones or clearing the browser.
 
 Progress per sign (seen, right, missed) and the day streak are kept in the browser's local storage.
 
@@ -110,7 +122,7 @@ To try the app on your computer: `node build/serve.mjs`, then open http://localh
 
 ### Updating
 
-Phones keep the cached copy until the version changes. When you change any file, bump `VERSION` in `sw.js` (`v1` → `v2`) and the `?v=1` tags in `index.html` and `store.js` to match.
+Phones keep the cached copy until the version changes. When you change any file, bump `VERSION` in `sw.js` (now `v3`, so next `v4`) and the `?v=3` tags in `index.html` and `store.js` to match.
 
 ## Credits
 
