@@ -30,6 +30,8 @@ export const state = {
   stays: [],             // [{label, address, host, phone}]
   stay: 0,               // index of the current stay
   exportSel: [],
+  dview: "days",         // Diary tab: "days" or "plan"
+  diary: { stops: [], days: {}, plans: [] },
 };
 
 export function load() {

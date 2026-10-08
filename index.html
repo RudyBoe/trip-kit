@@ -49,6 +49,16 @@
     <div id="pocket-view"></div>
   </section>
 
+  <!-- Diary -->
+  <section id="tab-diary" class="tab" hidden>
+    <div class="seg" role="tablist" aria-label="Diary">
+      <button data-dview="days" role="tab">Days</button>
+      <button data-dview="plan" role="tab">Schedule</button>
+    </div>
+    <div id="diary-view"></div>
+    <input type="file" id="d-import-file" accept="application/json,.json" hidden>
+  </section>
+
   <!-- Export -->
   <section id="tab-export" class="tab" hidden>
     <h2>Anki export</h2>
@@ -79,6 +89,7 @@
 <nav class="tabbar" aria-label="Sections">
   <button data-tab="signs"><span aria-hidden="true">止</span>Signs</button>
   <button data-tab="pocket"><span aria-hidden="true">話</span>Pocket</button>
+  <button data-tab="diary"><span aria-hidden="true">記</span>Diary</button>
   <button data-tab="export"><span aria-hidden="true">⇪</span>Export</button>
 </nav>
 
@@ -103,7 +114,7 @@
     <p class="credits">How long a sign stays on screen in Flash mode before the choices appear.</p>
 
     <h2>About</h2>
-    <p class="credits">Trip Kit drills the Japanese you meet on the road from Osaka through Shiga and Gifu into the Hida mountains and Toyama: signs, place names and phrases for hosts. A sibling of <a href="https://rudyboe.github.io/kanji-trainer/">Kanji Trainer</a>. Everything stays on this device; it works offline after the first visit.</p>
+    <p class="credits">Trip Kit drills the Japanese you meet on the road from Osaka through Shiga and Gifu into the Hida mountains and Toyama: signs, place names and phrases for hosts. A sibling of <a href="https://rudyboe.github.io/kanji-trainer/">Kanji Trainer</a>. Everything stays on this device; it works offline after the first visit. The Diary tab keeps your Google Maps stops and schedule on this device too.</p>
     <p class="credits">Readings checked against <a href="https://www.edrdg.org/jmdict/j_jmdict.html">JMdict</a> and <a href="https://www.edrdg.org/wiki/index.php/KANJIDIC_Project">KANJIDIC2</a> (© Electronic Dictionary Research and Development Group, CC BY-SA 4.0), via <a href="https://www.npmjs.com/package/kotobako-data">kotobako-data</a> and <a href="https://www.npmjs.com/package/kanji-data">kanji-data</a>. JLPT levels from <a href="https://www.tanos.co.uk/jlpt/">Jonathan Waller's JLPT lists</a>. Kanji keywords from James Heisig's <i>Remembering the Kanji</i> (via kanji-data). Lesson numbers refer to <i>Minna no Nihongo</i>.</p>
     <p class="credits">Signs, notes and phrases: written for this trip; check local rules on the spot (garbage days differ per town).</p>
     <button value="close" class="primary">Done</button>

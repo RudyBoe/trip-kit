@@ -297,3 +297,29 @@ dialog#menu::backdrop { background: rgb(0 0 0 / .45); }
   z-index: 10;
 }
 #toast.on { opacity: .92; }
+
+/* diary */
+#diary-view { padding-top: 8px; }
+.d-actions { display: flex; gap: 8px; margin: 4px 0 8px; }
+.d-actions button { flex: 0 0 auto; }
+.d-actions select { flex: 1; min-width: 0; }
+.d-tools { margin: 20px 0 8px; }
+.d-tools button { font-size: .9rem; }
+.d-mini { min-height: 36px; font-size: .85rem; padding: 0 10px; }
+.leg-head h3 { font-size: .95rem; }
+.d-today { font-size: .7rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--accent); border: 1px solid var(--accent); border-radius: 4px; padding: 0 5px; vertical-align: 2px; }
+.d-banner { margin: 8px 0 0; padding: 8px 12px; border-radius: 10px; background: var(--btn); border-left: 4px solid var(--ok); display: flex; gap: 8px; align-items: baseline; flex-wrap: wrap; }
+.d-banner.move { border-left-color: var(--accent); }
+.d-banner small { color: var(--muted); text-transform: uppercase; letter-spacing: .08em; font-size: .7rem; }
+.d-item { display: grid; grid-template-columns: 54px minmax(0, 1fr); gap: 10px; padding: 12px 0; }
+.d-time { color: var(--muted); font-size: .85rem; font-variant-numeric: tabular-nums; padding-top: 2px; }
+.d-time b { color: var(--fg); font-weight: 600; }
+.d-main p { margin: 0 0 4px; }
+.d-title { font-weight: 600; font-size: 1.05rem; overflow-wrap: anywhere; }
+.d-note { color: var(--muted); font-size: .9rem; line-height: 1.4; white-space: pre-wrap; overflow-wrap: anywhere; }
+.d-main .row { margin-top: 8px; }
+.d-main .row button, .d-main .row .btn { min-height: 44px; font-size: .9rem; }
+.d-plan { grid-template-columns: 92px minmax(0, 1fr); }
+.d-plan.past { opacity: .55; }
+.d-plan.now .d-time b { color: var(--accent); }
+.btn { flex: 1; display: flex; align-items: center; justify-content: center; text-decoration: none; color: inherit; background: var(--btn); border-radius: 12px; padding: 0 14px; }

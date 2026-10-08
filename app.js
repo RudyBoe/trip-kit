@@ -2,18 +2,19 @@
 import { data, state, load, save, $, updateScore, toast, VERSION } from "./store.js";
 import { initSigns, renderSigns } from "./signs.js";
 import { initPocket, renderPocket } from "./pocket.js";
+import { initDiary, renderDiary } from "./diary.js";
 import { initExport, renderExport } from "./export.js";
 
 load();
 let tab = location.hash.slice(1) || "signs";
 
 function showTab(t) {
-  if (!["signs", "pocket", "export"].includes(t)) t = "signs";
+  if (!["signs", "pocket", "diary", "export"].includes(t)) t = "signs";
   tab = t;
   document.querySelectorAll(".tab").forEach((s) => (s.hidden = s.id !== `tab-${t}`));
   document.querySelectorAll("[data-tab]").forEach((b) => b.setAttribute("aria-selected", b.dataset.tab === t));
   history.replaceState(null, "", `#${t}`);
-  ({ signs: renderSigns, pocket: renderPocket, export: renderExport })[t]();
+  ({ signs: renderSigns, pocket: renderPocket, diary: renderDiary, export: renderExport })[t]();
   scrollTo(0, 0);
 }
 
@@ -52,6 +53,7 @@ Promise.all([
   updateScore();
   initSigns();
   initPocket();
+  initDiary();
   initExport();
   showTab(tab);
 }).catch(() => toast("Couldn't load the data. Connect once to download it."));
