@@ -145,7 +145,137 @@ function plan() {
   bindCommon();
 }
 
-// Link helpers (the import section below adds the rest).
+// ---------------------------------------------------------------- forms (one dialog)
+
+function openForm(title, fields, submit, del, delLabel) {
+  const form = $("d-form");
+  form.innerHTML = `<h2>${title}</h2>${fields}<p class="d-err" id="d-err" role="alert"></p>
+    <div class="row"><button type="button" id="d-cancel2">Cancel</button><button type="submit" class="primary">Save</button></div>
+    ${del ? `<button type="button" class="danger wide" id="d-del">${delLabel || "Delete"}</button>` : ""}`;
+  $("d-cancel2").onclick = () => $("d-dlg").close();
+  form.onsubmit = (e) => {
+    e.preventDefault();
+    const msg = submit(new FormData(form));
+    if (msg) { $("d-err").textContent = msg; return; }
+    save();
+    $("d-dlg").close();
+    renderDiary();
+    toast("Saved");
+  };
+  if (del) {
+    $("d-del").onclick = () => {
+      if (!confirm(`${delLabel || "Delete"}?`)) return;
+      del();
+      save();
+      $("d-dlg").close();
+      renderDiary();
+    };
+  }
+  $("d-dlg").showModal();
+}
+
+const field = (label, id, inner) => `<label for="${id}">${label}${inner}</label>`;
+
+function stopForm(s) {
+  const v = s || { date: lastDate || today(), kind: "see" };
+  openForm(s ? "Edit stop" : "New stop", `
+    ${field("Google Maps link", "df-url", `<span class="d-inline"><input id="df-url" name="url" type="url" inputmode="url" autocomplete="off" placeholder="https://maps.app.goo.gl/…" value="${esc(v.url || "")}"><button type="button" id="d-paste">Paste</button></span>`)}
+    ${field("Place name", "df-title", `<input id="df-title" name="title" type="text" autocomplete="off" placeholder="Taken from the link when possible" value="${esc(v.title || "")}">`)}
+    <div class="row2">
+      ${field("Date", "df-date", `<input id="df-date" name="date" type="date" value="${esc(v.date)}">`)}
+      ${field("Time (optional)", "df-time", `<input id="df-time" name="time" type="time" value="${esc(v.time || "")}">`)}
+    </div>
+    <div class="row2">
+      ${field("Type", "df-kind", `<select id="df-kind" name="kind">${opts(KINDS, v.kind)}</select>`)}
+      ${field("Area", "df-leg", `<select id="df-leg" name="leg">${opts(LEGS, v.leg, "No area")}</select>`)}
+    </div>
+    ${field("Note", "df-note", `<textarea id="df-note" name="note" placeholder="Parking, opening hours, who you met…">${esc(v.note || "")}</textarea>`)}`,
+  (fd) => {
+    const r = parseMaps(fd.get("url"));
+    if (!r.ok) return r.msg;
+    const date = fd.get("date");
+    if (!date) return "Pick a date.";
+    const title = (fd.get("title") || "").trim() || r.title;
+    if (!title) return "Add a place name. Short links don't contain one.";
+    upsert(D().stops, { id: s?.id || uid(), url: r.url, title, date, time: fd.get("time") || "", kind: fd.get("kind") || "other", leg: fd.get("leg") || "", note: (fd.get("note") || "").trim(), createdAt: s?.createdAt || Date.now() });
+    lastDate = date;
+  },
+  s && (() => { D().stops = D().stops.filter((x) => x.id !== s.id); }),
+  "Delete this stop");
+  let touched = !!v.title;
+  $("df-title").oninput = () => (touched = true);
+  $("df-url").oninput = (e) => {
+    const r = parseMaps(e.target.value);
+    if (r.ok && r.title && !touched) $("df-title").value = r.title;
+  };
+  $("d-paste").onclick = async () => {
+    try {
+      $("df-url").value = (await navigator.clipboard.readText()).trim();
+      $("df-url").dispatchEvent(new Event("input"));
+    } catch { toast("Paste blocked. Long-press the field and paste."); }
+  };
+}
+
+function tripForm(date) {
+  const cur = D().days[date];
+  const v = cur || { date, mode: "day" };
+  openForm("Trip day", `
+    ${field("Date", "dt-date", `<input id="dt-date" name="date" type="date" value="${esc(date)}">`)}
+    ${field("Type of day", "dt-mode", `<select id="dt-mode" name="mode">${opts(MODES, v.mode)}</select>`)}
+    <div class="row2">
+      ${field("From", "dt-from", `<input id="dt-from" name="from" type="text" autocomplete="off" placeholder="Gifu house" value="${esc(v.from || "")}">`)}
+      ${field("To", "dt-to", `<input id="dt-to" name="to" type="text" autocomplete="off" placeholder="Takayama" value="${esc(v.to || "")}">`)}
+    </div>`,
+  (fd) => {
+    const dte = fd.get("date");
+    if (!dte) return "Pick a date.";
+    const mode = fd.get("mode");
+    if (dte !== date) delete D().days[date];
+    if (!mode) delete D().days[dte];
+    else D().days[dte] = { date: dte, mode, from: (fd.get("from") || "").trim(), to: (fd.get("to") || "").trim() };
+    lastDate = dte;
+  },
+  cur && (() => { delete D().days[date]; }),
+  "Clear trip info");
+}
+
+function planForm(s) {
+  const v = s || { start: lastDate || today(), kind: "house" };
+  openForm(s ? "Edit schedule item" : "New schedule item", `
+    ${field("What", "dp-title", `<input id="dp-title" name="title" type="text" autocomplete="off" placeholder="House in Gifu, rental car pickup…" value="${esc(v.title || "")}">`)}
+    <div class="row2">
+      ${field("Type", "dp-kind", `<select id="dp-kind" name="kind">${opts(PKINDS, v.kind)}</select>`)}
+      ${field("Address or place", "dp-place", `<input id="dp-place" name="place" type="text" lang="ja" autocomplete="off" value="${esc(v.place || "")}">`)}
+    </div>
+    <div class="row2">
+      ${field("From", "dp-start", `<input id="dp-start" name="start" type="date" value="${esc(v.start)}">`)}
+      ${field("To (optional)", "dp-end", `<input id="dp-end" name="end" type="date" value="${esc(v.end || "")}">`)}
+    </div>
+    ${field("Maps link (optional)", "dp-url", `<input id="dp-url" name="url" type="url" inputmode="url" autocomplete="off" value="${esc(v.url || "")}">`)}
+    ${field("Note", "dp-note", `<textarea id="dp-note" name="note" placeholder="Check-in time, host name, booking number…">${esc(v.note || "")}</textarea>`)}`,
+  (fd) => {
+    const title = (fd.get("title") || "").trim();
+    const start = fd.get("start");
+    const end = fd.get("end") || "";
+    if (!title) return "Say what this is.";
+    if (!start) return "Pick a start date.";
+    if (end && end < start) return "The end date is before the start date.";
+    let url = "";
+    const mu = (fd.get("url") || "").trim();
+    if (mu) {
+      const r = parseMaps(mu);
+      if (!r.ok) return r.msg;
+      url = r.url;
+    }
+    upsert(D().plans, { id: s?.id || uid(), title, kind: fd.get("kind") || "plan", place: (fd.get("place") || "").trim(), start, end, url, note: (fd.get("note") || "").trim(), createdAt: s?.createdAt || Date.now() });
+    lastDate = start;
+  },
+  s && (() => { D().plans = D().plans.filter((x) => x.id !== s.id); }),
+  "Delete this item");
+}
+
+// ---------------------------------------------------------------- import and text export
+
 const str = (x) => (typeof x === "string" ? x : "");
 const isDate = (x) => /^\d{4}-\d{2}-\d{2}$/.test(str(x));
 const safeUrl = (x) => (/^https?:\/\//i.test(str(x)) ? str(x) : "");

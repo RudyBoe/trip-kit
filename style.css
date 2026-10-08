@@ -61,7 +61,7 @@ button:disabled { opacity: .35; }
 .danger { color: var(--accent); }
 .wide { width: 100%; }
 .muted { color: var(--muted); font-size: .9rem; line-height: 1.4; }
-select, input[type="text"], textarea {
+select, input[type="text"], input[type="url"], input[type="date"], input[type="time"], textarea {
   font: inherit;
   color: inherit;
   background: var(--btn);
@@ -185,7 +185,7 @@ main { flex: 1; display: flex; flex-direction: column; }
 .ph { color: var(--accent); }
 .me-form { display: grid; gap: 10px; padding-top: 8px; }
 .me-form label { display: grid; gap: 4px; font-size: .85rem; color: var(--muted); }
-.me-form input { font-size: 1rem; color: var(--fg); }
+.me-form input, .me-form textarea { font-size: 1rem; color: var(--fg); }
 .stay { border: 1px solid var(--line); border-radius: 14px; padding: 12px; display: grid; gap: 10px; }
 .stay.current { border-color: var(--accent); }
 .stay .row button { min-height: 44px; font-size: .9rem; }
@@ -323,3 +323,13 @@ dialog#menu::backdrop { background: rgb(0 0 0 / .45); }
 .d-plan.past { opacity: .55; }
 .d-plan.now .d-time b { color: var(--accent); }
 .btn { flex: 1; display: flex; align-items: center; justify-content: center; text-decoration: none; color: inherit; background: var(--btn); border-radius: 12px; padding: 0 14px; }
+dialog#d-dlg { border: 0; border-radius: 16px; background: var(--bg); color: var(--fg); width: min(94vw, 460px); max-height: 92dvh; overflow-y: auto; padding: 20px; }
+dialog#d-dlg::backdrop { background: rgb(0 0 0 / .45); }
+#d-form h2 { margin: 0; font-size: 1.1rem; }
+#d-form input, #d-form select { width: 100%; font-size: 1rem; color: var(--fg); }
+.row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+@media (max-width: 380px) { .row2 { grid-template-columns: 1fr; } }
+.d-inline { display: flex; gap: 6px; }
+.d-inline input { flex: 1; }
+#d-paste { flex: 0 0 auto; min-height: 44px; }
+.d-err { color: var(--accent); margin: 0; min-height: 1.2em; font-size: .9rem; }
