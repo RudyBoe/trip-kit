@@ -77,6 +77,7 @@ function bindCommon() {
       else if (a === "day") tripForm(lastDate || today());
       else if (a === "trip") tripForm(b.dataset.date);
       else if (a === "edit") stopForm(D().stops.find((s) => s.id === b.dataset.id));
+      else if (a === "link") stopForm(D().stops.find((s) => s.id === b.dataset.id), true);
       else if (a === "padd") planForm(null);
       else if (a === "pedit") planForm(D().plans.find((s) => s.id === b.dataset.id));
       else if (a === "import") $("d-import-file").click();
@@ -114,7 +115,9 @@ function days() {
         <p class="d-title">${esc(s.title)}</p>
         <p class="d-tags"><span class="tag">${KINDS[s.kind] || "Other"}</span>${s.leg ? ` <span class="tag">${LEGS[s.leg]}</span>` : ""}</p>
         ${s.note ? `<p class="d-note">${esc(s.note)}</p>` : ""}
-        <div class="row"><a class="btn" href="${esc(safeUrl(s.url))}" target="_blank" rel="noopener">Open in Maps</a><button data-d="edit" data-id="${esc(s.id)}">Edit</button></div>
+        <div class="row">${safeUrl(s.url)
+          ? `<a class="btn" href="${esc(safeUrl(s.url))}" target="_blank" rel="noopener">Open in Maps</a>`
+          : `<button data-d="link" data-id="${esc(s.id)}">Add link</button>`}<button data-d="edit" data-id="${esc(s.id)}">Edit</button></div>
       </div></li>`).join("")}</ul>`;
   }
   view().innerHTML = html + tools();
@@ -176,10 +179,11 @@ function openForm(title, fields, submit, del, delLabel) {
 
 const field = (label, id, inner) => `<label for="${id}">${label}${inner}</label>`;
 
-function stopForm(s) {
+// focusLink: opened from "Add link", so start in the link field.
+function stopForm(s, focusLink) {
   const v = s || { date: lastDate || today(), kind: "see" };
   openForm(s ? "Edit stop" : "New stop", `
-    ${field("Google Maps link", "df-url", `<span class="d-inline"><input id="df-url" name="url" type="url" inputmode="url" autocomplete="off" placeholder="https://maps.app.goo.gl/…" value="${esc(v.url || "")}"><button type="button" id="d-paste">Paste</button></span>`)}
+    ${field("Google Maps link (optional)", "df-url", `<span class="d-inline"><input id="df-url" name="url" type="url" inputmode="url" autocomplete="off" placeholder="https://maps.app.goo.gl/…" value="${esc(v.url || "")}"><button type="button" id="d-paste">Paste</button></span>`)}
     ${field("Place name", "df-title", `<input id="df-title" name="title" type="text" autocomplete="off" placeholder="Taken from the link when possible" value="${esc(v.title || "")}">`)}
     <div class="row2">
       ${field("Date", "df-date", `<input id="df-date" name="date" type="date" value="${esc(v.date)}">`)}
@@ -191,12 +195,14 @@ function stopForm(s) {
     </div>
     ${field("Note", "df-note", `<textarea id="df-note" name="note" placeholder="Parking, opening hours, who you met…">${esc(v.note || "")}</textarea>`)}`,
   (fd) => {
-    const r = parseMaps(fd.get("url"));
+    // The link is optional, but a filled-in link must be a Google Maps link.
+    const raw = (fd.get("url") || "").trim();
+    const r = raw ? parseMaps(raw) : { ok: true, url: "", title: "" };
     if (!r.ok) return r.msg;
     const date = fd.get("date");
     if (!date) return "Pick a date.";
     const title = (fd.get("title") || "").trim() || r.title;
-    if (!title) return "Add a place name. Short links don't contain one.";
+    if (!title) return r.url ? "Add a place name. Short links don't contain one." : "Add a place name or a Maps link.";
     upsert(D().stops, { id: s?.id || uid(), url: r.url, title, date, time: fd.get("time") || "", kind: fd.get("kind") || "other", leg: fd.get("leg") || "", note: (fd.get("note") || "").trim(), createdAt: s?.createdAt || Date.now() });
     lastDate = date;
   },
@@ -214,6 +220,7 @@ function stopForm(s) {
       $("df-url").dispatchEvent(new Event("input"));
     } catch { toast("Paste blocked. Long-press the field and paste."); }
   };
+  if (focusLink) $("df-url").focus();
 }
 
 function tripForm(date) {
@@ -295,7 +302,8 @@ async function importFile(e) {
   const d = D();
   let a = 0, b = 0, c = 0;
   for (const s of Array.isArray(stops) ? stops : []) {
-    if (!s || !str(s.id) || !isDate(s.date) || !safeUrl(s.url)) continue;
+    // No link is fine; a link that isn't http(s) makes the row bad.
+    if (!s || !str(s.id) || !isDate(s.date) || (str(s.url) && !safeUrl(s.url))) continue;
     upsert(d.stops, { id: str(s.id), url: safeUrl(s.url), title: str(s.title) || "Untitled stop", date: s.date, time: str(s.time), kind: Object.hasOwn(KINDS, s.kind) ? s.kind : "other", leg: Object.hasOwn(LEGS, s.leg) ? s.leg : "", note: str(s.note), createdAt: Number(s.createdAt) || Date.now() });
     a++;
   }
@@ -338,7 +346,7 @@ function exportText() {
     for (const s of d.stops.filter((x) => x.date === k).sort((x, y) => (x.time || "99").localeCompare(y.time || "99"))) {
       out.push(`${s.time ? s.time + " " : ""}${s.title} [${KINDS[s.kind] || "Other"}${s.leg ? ", " + LEGS[s.leg] : ""}]`);
       if (s.note) out.push(`   ${s.note}`);
-      out.push(`   ${s.url}`);
+      if (s.url) out.push(`   ${s.url}`);
     }
     out.push("");
   }

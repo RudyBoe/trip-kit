@@ -2,7 +2,7 @@
 // fetched network-first (so updates arrive quickly), everything else
 // cache-first. Bump VERSION together with the ?v= tags in index.html and
 // store.js when anything changes.
-const VERSION = "v3";
+const VERSION = "v4";
 const CACHE = `trip-kit-${VERSION}`;
 const V = VERSION.replace("v", "v=");
 const FILES = [

@@ -1,7 +1,7 @@
 // Shared state, saved in localStorage, and small helpers.
 
 export const STORE = "trip-kit";
-export const VERSION = "v=3";
+export const VERSION = "v=4";
 
 export const CATEGORIES = {
   road: "Road", parking: "Parking", fuel: "Fuel", toll: "Toll / ETC", transit: "Train / bus",

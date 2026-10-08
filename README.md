@@ -31,10 +31,10 @@ Filters at the top: category, leg, and **✗** for the signs you missed last tim
 
 A dated trip diary and schedule that works offline, so you can log things in a car park in the mountains. Stored on the phone and included in the backup.
 
-- **Days**: tap *+ Stop*, paste a Google Maps link (the *Paste* button reads your clipboard), pick the date, an optional time, a type (stay, eat, see, drive, shop) and an area. The place name is taken from long links; short `maps.app.goo.gl` links have no name, so type it. *Open in Maps* opens the place in the Maps app. Stops are grouped by date.
+- **Days**: tap *+ Stop*, optionally paste a Google Maps link (the *Paste* button reads your clipboard), pick the date, an optional time, a type (stay, eat, see, drive, shop) and an area. The place name is taken from long links; short `maps.app.goo.gl` links have no name, so type it. Without a link the place name is required, so you can log a stop with no signal and add the link later: the stop shows *Add link* instead of *Open in Maps*. Stops are grouped by date.
 - **Trip day**: mark a date as a *day trip, back home* (from your house to a place and back) or a *move from A to B*. It shows as a banner above that day's stops.
 - **Schedule**: houses (with the number of nights), car rental, trains and plans with from/to dates. The current item is marked *Now*, past ones are dimmed.
-- **Import from web diary**: reads the JSON written by *Export backup* in the Tabi Diary web page and merges it (same id = updated, nothing is deleted).
+- **Import from web diary**: reads the JSON written by *Export backup* in the Tabi Diary web page and merges it (same id = updated, nothing is deleted). Stops without a link are imported too; rows with a link that isn't http(s) are skipped.
 - **Share as text**: the whole diary as a plain text file, for Notes or mail.
 
 Google Maps links need a connection to open. Download the areas you will drive through in the Google Maps app (*Offline maps*) so the places still open without signal.
@@ -122,7 +122,7 @@ To try the app on your computer: `node build/serve.mjs`, then open http://localh
 
 ### Updating
 
-Phones keep the cached copy until the version changes. When you change any file, bump `VERSION` in `sw.js` (now `v3`, so next `v4`) and the `?v=3` tags in `index.html` and `store.js` to match.
+Phones keep the cached copy until the version changes. When you change any file, bump `VERSION` in `sw.js` (now `v4`, so next `v5`) and the `?v=4` tags in `index.html` and `store.js` to match.
 
 ## Credits
 
